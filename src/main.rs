@@ -9,8 +9,7 @@ use syntax::errors::Handler;
 
 fn main() {
     let text = "fn test() ->".to_string();  // produces Err result
-    let text = "fn test(".to_string();      // ICE
-    let text = "fn test(a".to_string();     // quits silently
+    let text = "fn test(a".to_string();     // exits silently
 
     syntax::with_globals(syntax::source_map::edition::Edition::Edition2018, || {
         let source_map = Rc::new(SourceMap::new(FilePathMapping::empty()));
@@ -24,7 +23,6 @@ fn main() {
             text,
         );
 
-        
-        println!("{:?}", parser.unwrap().parse_crate_mod());
+        println!("{:?}", parser.unwrap().parse_crate_mod().map_err(|mut x| {x.cancel(); x}));
     })
 }
